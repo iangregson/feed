@@ -28,11 +28,11 @@ export function getObservable(url) {
         res.setEncoding('utf8')
         console.log('got response ', res.statusCode)
         subscription = RxNode.fromStream(res)
+        console.log('getObs..', subscription);
     })
     .on('error', e => {
         console.log('got error ', e)
         subscription = Observable.from(new Map(e))
     })
-    console.log('getObs..', subscription);
     return subscription
 }
