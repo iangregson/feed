@@ -1,0 +1,41 @@
+{
+  "name": "feed",
+  "version": "1.0.0",
+  "description": "A node.js service for turning an RSS feed into a JSON ticker",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha src/**/*.spec.js --compilers js:babel-register --watch",
+    "start": "nodemon index.js --exec babel-node --presets es2015",
+    "tests-once": "mocha src/**/*.spec.js --compilers js:babel-register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/iangregson/feed.git"
+  },
+  "keywords": [
+    "NodeJS",
+    "RSS"
+  ],
+  "author": "Ian Gregson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iangregson/feed/issues"
+  },
+  "homepage": "https://github.com/iangregson/feed#readme",
+  "devDependencies": {
+    "babel-core": "^6.13.2",
+    "babel-istanbul": "^0.11.0",
+    "babel-polyfill": "^6.13.0",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-register": "^6.11.6",
+    "chai": "^3.5.0",
+    "coveralls": "^2.11.12",
+    "istanbul": "^0.4.4",
+    "mocha": "^3.0.2",
+    "nodemon": "^1.10.0"
+  },
+  "dependencies": {
+    "rx-node": "^1.0.2",
+    "rxjs": "^5.0.0-beta.11"
+  }
+}
