@@ -34,6 +34,7 @@
     "nodemon": "^1.10.0"
   },
   "dependencies": {
+    "feedparser": "^1.1.4",
     "rx-node": "^1.0.2",
     "rxjs": "^5.0.0-beta.11"
   }

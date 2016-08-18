@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { Observable } from 'rxjs/Observable'
+import { RefCountObservable, Observable } from 'rxjs/Observable'
 
 import * as xhr from './xhr'
 
@@ -18,14 +18,23 @@ describe('The xhr module', () => {
         expect(xhr.getStream('http://google.com').then).to.be.a('function')
     })
 
-    it('should have a getObservable(url) method that returns a an observable of the response body for a given url', () => {
+    it('should have a getObservable(url) method that returns a an observable of the response body for a given url', (done) => {
         expect(xhr.getObservable).to.be.a('function')
-        // expect(xhr.getObservable('http://google.com')).to.be.instanceOf(Observable)
         expect(xhr.getObservable('http://google.com')).to.be.a('promise')
         xhr.getObservable('http://google.com').then(
-            res => expect(res).to.be.instanceOf(Observable)
+            res => {
+                expect(res).to.be.ok
+                expect(res).to.be.a('object').to.have.property('source')
+                expect(res.subscribe).to.be.a('function')
+                done()
+            }
         ).catch(
-            e => expect(e).to.be.instanceOf(Observable)
+            e => {
+                expect(res).to.be.ok
+                expect(res).to.be.a('object').to.have.property('source')
+                expect(res.subscribe).to.be.a('function')
+                done()
+            }
         )
     })
 })
