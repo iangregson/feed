@@ -1,6 +1,6 @@
 import * as http from 'http'
 import * as RxNode from 'rx-node'
-import Observable from 'rxjs/Observable'
+import { Observable, Map } from 'rxjs/Observable'
 
 // Returns a promise that resovles the full response body for a given url
 export function get(url) {
@@ -20,19 +20,21 @@ export function get(url) {
     )
 }
 
+// Returns a promise that resovles the response stream for a given url
+export function getStream(url) {
+    return new Promise(
+        (resolve, reject) => {
+            http.get(url, res => resolve(res))
+            .on('error', e => reject(e))
+        }
+    )
+}
+
 // Returns an Observable of the response for a given url
 export function getObservable(url) {
-    let subscription
-    console.log('trying to get ', url)
-    http.get(url, res => {
-        res.setEncoding('utf8')
-        console.log('got response ', res.statusCode)
-        subscription = RxNode.fromStream(res)
-        console.log('getObs..', subscription);
+    return getStream(url).then(res => { 
+        res.setEncoding('utf-8')
+        return RxNode.fromStream(res)
     })
-    .on('error', e => {
-        console.log('got error ', e)
-        subscription = Observable.from(new Map(e))
-    })
-    return subscription
+    .catch(e => Observable.from(new Map(e)))
 }

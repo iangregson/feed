@@ -1,6 +1,8 @@
-import { get } from './xhr'
+import { get, getObservable, getStream } from './xhr'
 
 export function app() {
-    get('http://blog.samaltman.com/posts.atom').then(res => console.log('Got response'))
-                            .catch(e => console.log('Got error: ', e))
+    const url = 'http://blog.samaltman.com/posts.atom'
+    getObservable(url).then(
+        res => res.subscribe(x => console.log(x))
+    )
 }
