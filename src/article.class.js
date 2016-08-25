@@ -1,4 +1,4 @@
-export class article {
+export class Article {
     constructor(props) {
         const articleProperties = ['title', 'description', 'author', 'date', 'link']
 
