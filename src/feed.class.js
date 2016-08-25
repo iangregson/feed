@@ -79,3 +79,25 @@ export function refreshFeed(existingFeed) {
         }
     )
 }
+
+export class FeedCache {
+    constructor(props) {
+        this.cache = [];
+    }
+
+    cacheFeed(feed) {
+        while (this.ids().includes(feed.xml.url)) {
+            this.cache.splice()
+        }
+        this.cache.push({ id: feed.xmlurl, feed: feed })
+        return feed.xmlurl
+    }
+
+    getFeed(id) {
+        return 
+    }
+
+    ids() {
+        return this.cache.map(entry => entry.id)
+    }
+}
