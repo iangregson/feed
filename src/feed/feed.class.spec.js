@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { Feed } from './feed.class'
+import Feed from './feed.class'
 
 const dummyFeed = {
     title: 'New feed',
@@ -39,6 +39,39 @@ describe('feed class', () => {
         expect(feed.toDate(feed.date.toString())).to.be.instanceOf(Date)
         expect(feed.toDate('nonsensedate')).to.be.false.to.not.be.instanceOf(Date)
     })
+
+    it('should expose an event emitter emit() method to publish events', (done) => {
+        expect(new Feed(dummyFeed).emit).to.be.a('function')
+        let feed = new Feed(dummyFeed)
+        feed.on('event', 
+            (data) => {
+                expect(data).to.be.a('string').to.equal('Test event')
+                done()
+            }
+        )
+        feed.emit('event', 'Test event')
+    })
+
+    it('should expose an event emitter on() method to receive events', (done) => {
+        expect(new Feed(dummyFeed).on).to.be.a('function')
+        let feed = new Feed(dummyFeed)
+        feed.on('event', 
+            (data) => {
+                expect(data).to.be.a('string').to.equal('Test event')
+                done()
+            }
+        )
+        feed.emit('event', 'Test event')
+    })
         
 })
-    
+
+// // From old ticker module
+// it('should have a read() method that retrieves a feed and emits an event for each entry and when complete', (done) => {
+//     let ticker = new Ticker(url)        
+//     ticker.on('starting', (data) => expect(data).to.equal(url))
+//     ticker.on('newEntry', (entry) => expect(entry).to.be.instanceOf(Article))
+//     ticker.on('completeFeed', (data) => { expect(data).to.be.a('string').to.equal('Finished reading ' + url); done(); })
+//     ticker.on('error', (error) => assert.fail(error))
+//     ticker.read()
+// })

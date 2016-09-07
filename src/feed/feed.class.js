@@ -1,9 +1,10 @@
-import { observableXmlStream } from './parser'
-import { getStream } from './xhr'
+import { observableXmlStream, xhr, scheduler } from '../util'
 import { Article } from './article.class';
+import { EventEmitter } from 'events'
 
-export class Feed {
+export default class Feed extends EventEmitter {
     constructor(props) {
+        super(props)
         const feedProperties = ['title', 'link', 'xmlurl', 'date', 'pubdate', 'author', 'copyright']
 
         if (!props) throw new Error('A feed has to be created from a feed object')
@@ -14,6 +15,14 @@ export class Feed {
             }
         )
         this.entries = []
+    }
+
+    on(...args) {
+        return super.on(...args)
+    }
+
+    emit(...args) {
+        return super.emit(...args);
     }
 
     addEntry(entry) {
@@ -54,28 +63,17 @@ export function getFeed(url) {
     )
 }
 
-// Returns promise of the refreshed fully downloaded and parsed feed
-// or resolves with false if there has not been an update
-export function refreshFeed(existingFeed) {
-    return new Promise(
-        (resovle, reject) => {
-            let feed
-            getStream(existingFeed.xmlurl)
-            .then(res => observableXmlStream(res)
-            .subscribe(entry, error, complete))
-            .catch(e => reject(e))
-
-            function entry(entry) {
-                if (!feed) feed = new Feed(entry.meta)
-                feed.addEntry(new Article(entry))
-            }
-            function error(error) {
-                reject(error)
-            }
-            function complete() {
-                console.log('There are last update was ' + feed.date)
-                resolve(feed)
-            }
-        }
-    )
-}
+// // From old ticker module 
+// read() {
+//     this.emit('starting', this.url)
+//     getStream(this.url)
+//     .then(res => {
+//         observableXmlStream(res)
+//         .subscribe(
+//             (entry) => this.emit('newEntry', new Article(entry)),
+//             (error) => this.emit('error', error),
+//             () => this.emit('completeFeed', 'Finished reading ' + this.url)
+//         )
+//     })
+//     .catch(e => console.log(e))
+// }

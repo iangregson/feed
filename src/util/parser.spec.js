@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { observableXmlStream } from './parser';
+import observableXmlStream from './parser';
 import { getStream } from './xhr'
 
 describe('xml parser', () => {
