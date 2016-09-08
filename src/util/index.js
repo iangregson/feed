@@ -1,4 +1,5 @@
 import * as xhr from './xhr'
+import observableXmlStream from './parser'
+import every from './scheduler'
 
-export { observableXmlStream } from './parser'
-export { xhr }
+export { observableXmlStream, xhr, every }

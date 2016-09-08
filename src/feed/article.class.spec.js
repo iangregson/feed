@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { Article } from './article.class'
+import Article from './article.class'
 
 const dummyArticle = {
     title: 'New article',

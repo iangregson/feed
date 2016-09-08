@@ -1,20 +1,30 @@
-import { observableXmlStream, xhr, scheduler } from '../util'
-import { Article } from './article.class';
 import { EventEmitter } from 'events'
+
+import { observableXmlStream, xhr, scheduler } from '../util'
+import Article from './article.class';
 
 export default class Feed extends EventEmitter {
     constructor(props) {
         super(props)
+        if (!props.url) throw new Error('Can\'t create a new feed - We need a url to fetch the feed from.')
+        this._url = props.url
+        this._refreshInterval = props.refreshInterval || 5
+        this.entries = []
+    }
+
+    init() {
+        this.getFeed(this._url)
+    }
+
+    setMeta(meta) {
         const feedProperties = ['title', 'link', 'xmlurl', 'date', 'pubdate', 'author', 'copyright']
+        if (!meta) throw new Error('A feed\'s meta information has to be created from a feed meta object')
 
-        if (!props) throw new Error('A feed has to be created from a feed object')
-
-        Object.keys(props).forEach(
+        Object.keys(meta).forEach(
             key => {
-                if (feedProperties.indexOf(key) > -1) this[key] = props[key]
+                if (feedProperties.indexOf(key) > -1) this[key] = meta[key]
             }
         )
-        this.entries = []
     }
 
     on(...args) {
@@ -29,51 +39,45 @@ export default class Feed extends EventEmitter {
         this.entries.push(entry)
     }
 
-    articles() {
+    titles() {
         return this.entries.map(entry => entry.title)
+    }
+
+    // Get the first ten articles and send them out at an interval of 5 seconds
+    top(x = 10, t = 5) {
+        // TODO fix this
+        // const a = [1,2,3,4,5]
+        // // Converts an array to an observable sequence
+        // return Observable.from(a)
     }
 
     toDate(s) {
         return (new Date(s) == 'Invalid Date') ? false : new Date(s) 
     }
+
+    getFeed(url) {
+        this.emit('loading', 'Loading ' + url + '...')
+        xhr.getStream(url)
+        .then(
+            res => observableXmlStream(res)
+            .subscribe(
+                entry => {
+                    if (!this.meta) this.setMeta(entry.meta)
+                    this.addEntry(new Article(entry))
+                    this.emit('entry', new Article(entry))
+                },
+                error => {
+                    this.emit('error', error)
+                },
+                complete => {
+                    this.emit('ready', 'Finished reading ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.')
+                }
+            )
+        )
+        .catch(e => this.emit('error', e))
+    }
+
+    poll(url = this._url, lastUpdated = this.toDate(_date)) {
+        
+    }
 }
-
-// Returns promise of the fully downloaded and parsed feed
-export function getFeed(url) {
-    return new Promise(
-        (resovle, reject) => {
-            let feed
-            getStream(url)
-            .then(res => observableXmlStream(res)
-            .subscribe(entry, error, complete))
-            .catch(e => reject(e))
-
-            function entry(entry) {
-                if (!feed) feed = new Feed(entry.meta)
-                feed.addEntry(new Article(entry))
-            }
-            function error(error) {
-                reject(error)
-            }
-            function complete() {
-                console.log('There are ' + feed.articles().length + ' articles in the feed.');
-                resolve(feed)
-            }
-        }
-    )
-}
-
-// // From old ticker module 
-// read() {
-//     this.emit('starting', this.url)
-//     getStream(this.url)
-//     .then(res => {
-//         observableXmlStream(res)
-//         .subscribe(
-//             (entry) => this.emit('newEntry', new Article(entry)),
-//             (error) => this.emit('error', error),
-//             () => this.emit('completeFeed', 'Finished reading ' + this.url)
-//         )
-//     })
-//     .catch(e => console.log(e))
-// }

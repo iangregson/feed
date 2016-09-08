@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 
-import { app } from './app'
-
+import App from './app'
 
 describe('The app', () => {
     
