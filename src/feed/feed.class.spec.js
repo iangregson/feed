@@ -22,6 +22,7 @@ let feed
 describe('feed class', () => {
 
     beforeEach(() => {
+        this.timeout(5000)
         feed = new Feed(dummyFeed)
         feed.setMeta(dummyMeta)
     })
@@ -122,6 +123,13 @@ describe('feed class', () => {
                 )
         })
         feed.init()
-    })  
+    })
     
+    it('should a sortByDate method that returns a promise', () => {
+        expect(feed.sortByDate).to.be.a('function')
+        // expect(feed.sortByDate.then).to.be.a('function')
+        expect(feed.sortByDate()).to.be.a('promise')
+
+    })
+
 })

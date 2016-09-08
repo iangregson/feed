@@ -57,6 +57,10 @@ export default class Feed extends EventEmitter {
         return (new Date(s) == 'Invalid Date') ? false : new Date(s) 
     }
 
+    toPrettyDate(s) {
+        return (new Date(s) == 'Invalid Date') ? false : new Date(s) 
+    }
+
     getFeed(url) {
         this.emit('loading', 'Loading ' + url + '...')
         xhr.getStream(url)
