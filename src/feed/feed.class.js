@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+import Rx from 'rxjs'
 
 import { observableXmlStream, xhr, scheduler } from '../util'
 import Article from './article.class';
@@ -44,11 +45,8 @@ export default class Feed extends EventEmitter {
     }
 
     // Get the first ten articles and send them out at an interval of 5 seconds
-    top(x = 10, t = 5) {
-        // TODO fix this
-        // const a = [1,2,3,4,5]
-        // // Converts an array to an observable sequence
-        // return Observable.from(a)
+    top(x = 10, t = 2) {
+        return Rx.Observable.from(this.entries).take(x).zip(Rx.Observable.interval(t*1000), (a, b) => a)
     }
 
     toDate(s) {

@@ -106,8 +106,22 @@ describe('feed class', () => {
         expect(feed.titles()).to.be.a('array').to.have.length(feed.entries.length)
     })
     
-    it('should have a top method that returns an observable of the first given number of items in the feed', () => {
-        expect(feed.top).to.be.a('function')  
+    it('should have a top method that returns an observable of the first given number of items in the feed', (done) => {
+        expect(feed.top).to.be.a('function')
+        expect(feed.top(5).subscribe).to.be.a('function')
+        feed.on('ready', () => {
+            let titles = []
+            feed.top(5,0)
+                .subscribe(
+                    (i) => titles.push(i.title),
+                    (e) => assert.fail(e),
+                    (c) => {
+                        expect(titles).to.be.a('array').to.have.length(5)
+                        done()
+                    }
+                )
+        })
+        feed.init()
     })  
     
 })
