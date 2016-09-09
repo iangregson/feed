@@ -15,7 +15,14 @@ export default class Feed extends EventEmitter {
     }
 
     init() {
+        let self = this
         this.getFeed(this._url)
+        this.on('loaded', () => {
+            every(this.refreshInterval, this.poll, self)
+            this.sortByDate()
+                .then(sorted => this.emit('ready', 'Finished reading and sorting ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date))
+                .catch(error => this.emit('error', error))
+        })
     }
 
     setMeta(meta) {
@@ -57,10 +64,6 @@ export default class Feed extends EventEmitter {
         return (new Date(s) == 'Invalid Date') ? false : new Date(s) 
     }
 
-    toPrettyDate(s) {
-        return (new Date(s) == 'Invalid Date') ? false : new Date(s) 
-    }
-
     getFeed(url) {
         this.emit('loading', 'Loading ' + url + '...')
         xhr.getStream(url)
@@ -76,11 +79,7 @@ export default class Feed extends EventEmitter {
                     this.emit('error', error)
                 },
                 complete => {
-                    let self = this
-                    every(this.refreshInterval, this.poll, self)
-                    this.sortByDate()
-                        .then(sorted => this.emit('ready', 'Finished reading and sorting ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date))
-                        .catch(error => this.emit('error', error))
+                    this.emit('loaded', 'Finished downloading ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date)
                 }
             )
         )

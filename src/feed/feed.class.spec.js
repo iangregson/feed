@@ -22,7 +22,6 @@ let feed
 describe('feed class', () => {
 
     beforeEach(() => {
-        this.timeout(5000)
         feed = new Feed(dummyFeed)
         feed.setMeta(dummyMeta)
     })
@@ -50,7 +49,7 @@ describe('feed class', () => {
         expect(feed.getFeed).to.be.a('function')
         feed.on('loading', (data) => expect(data).to.equal('Loading ' + feed._url + '...'))
         feed.on('newEntry', (entry) => expect(entry).to.be.instanceOf(Article))
-        feed.on('ready', (data) => { expect(data).to.be.a('string').to.contain('Finished reading ' + feed._url); done(); })
+        feed.on('loaded', (data) => { expect(data).to.be.a('string').to.contain('Finished downloading ' + feed._url); done(); })
         feed.on('error', (error) => assert.fail(error))
         feed.getFeed(feed._url)
     })
@@ -125,11 +124,9 @@ describe('feed class', () => {
         feed.init()
     })
     
-    it('should a sortByDate method that returns a promise', () => {
+    it('should have a sortByDate method that returns a promise', () => {
         expect(feed.sortByDate).to.be.a('function')
-        // expect(feed.sortByDate.then).to.be.a('function')
         expect(feed.sortByDate()).to.be.a('promise')
-
     })
-
+  
 })
