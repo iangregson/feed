@@ -8,11 +8,11 @@ export default function App(url = process.env.URL) {
     feed.init()
 
     function listTitles(n, t) {
-        return feed.top(n,t)
-            .subscribe(
-                i => console.log(i.title),
-                e => console.log(e),
-                d => listTitles(n, t)
-            )
+        feed.top(n,t)
+        .subscribe(
+            i => console.log(i.title),
+            e => console.log(e),
+            d => listTitles(n, t)
+        )
     }
 }

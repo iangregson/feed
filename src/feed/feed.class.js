@@ -16,13 +16,20 @@ export default class Feed extends EventEmitter {
 
     init() {
         let self = this
-        this.getFeed(this._url)
-        this.on('loaded', () => {
-            every(this.refreshInterval, this.poll, self)
-            this.sortByDate()
-                .then(sorted => this.emit('ready', 'Finished reading and sorting ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date))
-                .catch(error => this.emit('error', error))
+        self.getFeed(self._url)
+        self.on('loaded', () => {
+            every(self.refreshInterval, self.poll, self)
+            self.sortByDate(self)
+                .then(sorted => self.emit('ready', 'Finished reading and sorting ' + self._url + '. There are ' + self.titles().length + ' articles in the feed.' + '\n The last update was on ' + self.date))
+                .catch(error => self.emit('error', error))
         })
+        self.on('reloaded', () => {
+            console.log('just reloaded the feed!');
+            // self._sortedEntries = [{title: 'Test updates!'}]
+            self.sortByDate(self)
+                .then(sorted => self.emit('updateComplete', 'Finished reading and sorting ' + self._url + '. There are ' + self.titles().length + ' articles in the feed.' + '\n The last update was on ' + self.date))
+                .catch(error => self.emit('error', error))
+        })        
     }
 
     setMeta(meta) {
@@ -55,7 +62,7 @@ export default class Feed extends EventEmitter {
     // Get the first ten articles and send them out at an interval of 5 seconds
     top(x = 10, t = 2) {
         return Rx.Observable
-                .from(this.entries)
+                .from(this._sortedEntries)
                 .take(x)
                 .zip(Rx.Observable.interval(t*1000), (a, b) => a)
     }
@@ -64,8 +71,9 @@ export default class Feed extends EventEmitter {
         return (new Date(s) == 'Invalid Date') ? false : new Date(s) 
     }
 
-    getFeed(url) {
+    getFeed(url, refresh = false) {
         this.emit('loading', 'Loading ' + url + '...')
+        if (refresh) this.entries = []
         xhr.getStream(url)
         .then(
             res => observableXmlStream(res)
@@ -79,7 +87,8 @@ export default class Feed extends EventEmitter {
                     this.emit('error', error)
                 },
                 complete => {
-                    this.emit('loaded', 'Finished downloading ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date)
+                    if (!refresh) this.emit('loaded', 'Finished downloading ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date)
+                    else this.emit('reloaded', 'Finished updating ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date)
                 }
             )
         )
@@ -93,27 +102,23 @@ export default class Feed extends EventEmitter {
             res => observableXmlStream(res)
             .take(1)
             .subscribe(
-                entry => { if (self.toDate(entry.meta.date) > self.date) self.updateFeed() },
+                entry => { if (self.toDate(entry.meta.date) > self.date) self.getFeed(self._url, true) },
                 error => self.emit('error', error),
                 complete => self.emit('pollComplete')))
         .catch(e => self.emit('error', e))
     }
 
-    updateFeed() {
-
-    }
-
-    sortByDate(entries = this.entries) {
+    sortByDate(self) {
         return new Promise(
             (resolve, reject) => {
-                this._sortedEntries = 
-                    entries
+                self._sortedEntries = 
+                    self.entries
                     .map(entry => {
-                        entry._date = this.toDate(entry.date)
+                        entry._date = self.toDate(entry.date)
                         if (!entry._date) reject(new Error('Articles contain invalid dates'))
                         return entry })
-                    .sort((a, b) => a._date - b._date)
-                resolve(this._sortedEntries)
+                    .sort((a, b) => b._date - a._date)
+                resolve(self._sortedEntries)
             }
         )
     }
