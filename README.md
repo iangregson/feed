@@ -1,7 +1,11 @@
-# Feed
+# Scruffy
 A node.js service for turning an RSS feed into a JSON ticker
 
 [![Build Status](https://travis-ci.org/iangregson/feed.svg?branch=master)](https://travis-ci.org/iangregson/feed)
+
+## Install from npm:
+
+`npm install scruffy --save`
 
 ## Example:
 
