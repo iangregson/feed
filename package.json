@@ -1,12 +1,16 @@
 {
-  "name": "feed",
+  "name": "scruffy",
   "version": "1.0.0",
   "description": "A node.js service for turning an RSS feed into a JSON ticker",
   "main": "index.js",
   "scripts": {
     "test": "mocha src/**/*.spec.js --compilers js:babel-register --watch",
     "start": "env $(cat .env) nodemon src/bin/dev.js --exec babel-node --presets es2015",
-    "tests-once": "mocha src/**/*.spec.js --compilers js:babel-register"
+    "example": "env $(cat .env) nodemon example --exec babel-node --presets es2015",
+    "tests-once": "mocha src/**/*.spec.js --compilers js:babel-register",
+    "prebuild": "npm run clean && npm run tests-once",
+    "build": "babel src --out-dir dist --ignore bin,app.js,app.spec.js",
+    "clean": "rm -rf dist"
   },
   "repository": {
     "type": "git",
@@ -19,9 +23,9 @@
   "author": "Ian Gregson",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/iangregson/feed/issues"
+    "url": "https://github.com/iangregson/scruffy/issues"
   },
-  "homepage": "https://github.com/iangregson/feed#readme",
+  "homepage": "https://github.com/iangregson/scruffy#readme",
   "devDependencies": {
     "babel-cli": "6.11.4",
     "babel-core": "6.13.2",
@@ -36,7 +40,6 @@
   "dependencies": {
     "feedparser": "^1.1.4",
     "rx-node": "^1.0.2",
-    "rxjs": "5.0.0-beta.11",
-    "rxjs-es": "5.0.0-beta.11"
+    "rxjs": "5.0.0-beta.11"
   }
 }
