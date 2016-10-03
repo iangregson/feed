@@ -1,39 +1,44 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>Scruffy by iangregson</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <meta name="viewport" content="width=device-width">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Scruffy</h1>
-        <p>A node service for turning an rss feed into a JSON ticker</p>
+    <section class="page-header">
+      <h1 class="project-name">Scruffy</h1>
+      <h2 class="project-tagline">A node service for turning an rss feed into a JSON ticker</h2>
+      <a href="https://github.com/iangregson/scruffy" class="btn">View on GitHub</a>
+      <a href="https://github.com/iangregson/scruffy/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/iangregson/scruffy/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <p class="view"><a href="https://github.com/iangregson/scruffy">View the Project on GitHub <small>iangregson/scruffy</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/iangregson/scruffy/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/iangregson/scruffy/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/iangregson/scruffy">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>
-<a id="scruffy" class="anchor" href="#scruffy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Scruffy</h1>
+    <section class="main-content">
+      <h1>
+<a id="feed" class="anchor" href="#feed" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Feed</h1>
 
 <p>A node.js service for turning an RSS feed into a JSON ticker</p>
 
 <p><a href="https://travis-ci.org/iangregson/feed"><img src="https://travis-ci.org/iangregson/feed.svg?branch=master" alt="Build Status"></a></p>
+
+<h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example:</h2>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> { <span class="pl-smi">Feed</span> } <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>scruffy<span class="pl-pds">'</span></span>
+
+<span class="pl-k">const</span> <span class="pl-c1">feed</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Feed</span>({ url<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>http://blog.samaltman.com/posts.atom<span class="pl-pds">'</span></span> })
+
+<span class="pl-smi">feed</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>ready<span class="pl-pds">'</span></span>, () <span class="pl-k">=&gt;</span> <span class="pl-smi">feed</span>.<span class="pl-c1">top</span>().<span class="pl-en">subscribe</span>(<span class="pl-smi">item</span> <span class="pl-k">=&gt;</span> <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-smi">item</span>.<span class="pl-c1">title</span>)))
+
+<span class="pl-smi">feed</span>.<span class="pl-en">init</span>()</pre></div>
+
+<h3>
+<a id="commands" class="anchor" href="#commands" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Commands</h3>
 
 <p>Run nodemon for development</p>
 
@@ -46,13 +51,23 @@
 <p>Run tests once</p>
 
 <div class="highlight highlight-source-shell"><pre>npm run tests-once</pre></div>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/iangregson">iangregson</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+
+<p>Build</p>
+
+<div class="highlight highlight-source-shell"><pre>npm run build</pre></div>
+
+<p>Run example</p>
+
+<div class="highlight highlight-source-shell"><pre>npm run example</pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/iangregson/scruffy">Scruffy</a> is maintained by <a href="https://github.com/iangregson">iangregson</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+
+    </section>
+
+  
   </body>
 </html>
