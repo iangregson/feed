@@ -1,0 +1,6 @@
+{
+  "name": "Scruffy",
+  "tagline": "A node service for turning an rss feed into a JSON ticker",
+  "body": "# Scruffy\r\nA node.js service for turning an RSS feed into a JSON ticker\r\n\r\n[![Build Status](https://travis-ci.org/iangregson/feed.svg?branch=master)](https://travis-ci.org/iangregson/feed)\r\n\r\nRun nodemon for development\r\n```sh\r\nnpm start\r\n```\r\n\r\nRun tests and watch for changes for development\r\n```sh\r\nnpm test\r\n```\r\n\r\nRun tests once\r\n```sh\r\nnpm run tests-once\r\n```",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
