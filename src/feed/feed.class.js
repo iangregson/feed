@@ -8,27 +8,25 @@ export default class Feed extends EventEmitter {
     constructor(props) {
         super(props)
         if (!props.url) throw new Error('Can\'t create a new feed - we need a url to fetch it from.')
-        this._url = props.url
+        this.url = props.url
         this.refreshInterval = props.refreshInterval || 5
         this.entries = []
-        this._sortedEntries = []
+        this.sortedEntries = []
     }
 
     init() {
-        let self = this
-        self.getFeed(self._url)
-        self.on('loaded', () => {
-            every(self.refreshInterval, self.poll, self)
-            self.sortByDate(self)
-                .then(sorted => self.emit('ready', 'Finished reading and sorting ' + self._url + '. There are ' + self.titles().length + ' articles in the feed.' + '\n The last update was on ' + self.date))
-                .catch(error => self.emit('error', error))
+        let feed = this
+        feed.getFeed(feed.url)
+        feed.on('loaded', () => {
+            every(feed.refreshInterval, feed.poll, feed)
+            feed.sortByDate(feed)
+                .then(sorted => feed.emit('ready', 'Finished reading and sorting ' + feed.url + '. There are ' + feed.titles().length + ' articles in the feed.' + '\n The last update was on ' + feed.date))
+                .catch(error => feed.emit('error', error))
         })
-        self.on('reloaded', () => {
-            console.log('just reloaded the feed!');
-            // self._sortedEntries = [{title: 'Test updates!'}]
-            self.sortByDate(self)
-                .then(sorted => self.emit('updateComplete', 'Finished reading and sorting ' + self._url + '. There are ' + self.titles().length + ' articles in the feed.' + '\n The last update was on ' + self.date))
-                .catch(error => self.emit('error', error))
+        feed.on('reloaded', () => {
+            feed.sortByDate(feed)
+                .then(sorted => feed.emit('updateComplete', 'Finished reading and sorting ' + feed.url + '. There are ' + feed.titles().length + ' articles in the feed.' + '\n The last update was on ' + feed.date))
+                .catch(error => feed.emit('error', error))
         })        
     }
 
@@ -62,7 +60,7 @@ export default class Feed extends EventEmitter {
     // Get the first ten articles and send them out at an interval of 5 seconds
     top(x = 10, t = 2) {
         return Rx.Observable
-                .from(this._sortedEntries)
+                .from(this.sortedEntries)
                 .take(x)
                 .zip(Rx.Observable.interval(t*1000), (a, b) => a)
     }
@@ -87,38 +85,38 @@ export default class Feed extends EventEmitter {
                     this.emit('error', error)
                 },
                 complete => {
-                    if (!refresh) this.emit('loaded', 'Finished downloading ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date)
-                    else this.emit('reloaded', 'Finished updating ' + this._url + '. There are ' + this.titles().length + ' articles in the feed.' + '\n The last update was on ' + this.date)
+                    if (!refresh) this.emit('loaded')
+                    else this.emit('reloaded')
                 }
             )
         )
         .catch(e => this.emit('error', e))
     }
 
-    poll(self) {
-        self.emit('polling')
-        xhr.getStream(self._url)
+    poll(feed) {
+        feed.emit('polling')
+        xhr.getStream(feed.url)
         .then(
             res => observableXmlStream(res)
             .take(1)
             .subscribe(
-                entry => { if (self.toDate(entry.meta.date) > self.date) self.getFeed(self._url, true) },
-                error => self.emit('error', error),
-                complete => self.emit('pollComplete')))
-        .catch(e => self.emit('error', e))
+                entry => { if (feed.toDate(entry.meta.date) > feed.date) feed.getFeed(feed.url, true) },
+                error => feed.emit('error', error),
+                complete => feed.emit('pollComplete')))
+        .catch(e => feed.emit('error', e))
     }
 
-    sortByDate(self) {
+    sortByDate(feed) {
         return new Promise(
             (resolve, reject) => {
-                self._sortedEntries = 
-                    self.entries
+                feed.sortedEntries = 
+                    feed.entries
                     .map(entry => {
-                        entry._date = self.toDate(entry.pubdate)
+                        entry._date = feed.toDate(entry.pubdate)
                         if (!entry._date) reject(new Error('Articles contain invalid dates'))
                         return entry })
                     .sort((a, b) => b._date - a._date)
-                resolve(self._sortedEntries)
+                resolve(feed.sortedEntries)
             }
         )
     }
