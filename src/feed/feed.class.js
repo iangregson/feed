@@ -114,7 +114,7 @@ export default class Feed extends EventEmitter {
                 self._sortedEntries = 
                     self.entries
                     .map(entry => {
-                        entry._date = self.toDate(entry.date)
+                        entry._date = self.toDate(entry.pubdate)
                         if (!entry._date) reject(new Error('Articles contain invalid dates'))
                         return entry })
                     .sort((a, b) => b._date - a._date)

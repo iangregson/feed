@@ -1,6 +1,6 @@
 export default class Article {
     constructor(props) {
-        const articleProperties = ['title', 'description', 'author', 'date', 'link'] // TODO put these in a config file
+        const articleProperties = ['title', 'description', 'author', 'date', 'pubdate', 'link'] // TODO put these in a config file
 
         if (!props) throw new Error('An article has to be created from an article object')
 
