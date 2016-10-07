@@ -85,7 +85,7 @@ export default class Feed extends EventEmitter {
                     this.emit('error', error)
                 },
                 complete => {
-                    if (!refresh) this.emit('loaded')
+                    if (!refresh) this.emit('loaded', 'Finished downloading')
                     else this.emit('reloaded')
                 }
             )
@@ -119,5 +119,9 @@ export default class Feed extends EventEmitter {
                 resolve(feed.sortedEntries)
             }
         )
+    }
+
+    size() {
+        return this.entries.length
     }
 }

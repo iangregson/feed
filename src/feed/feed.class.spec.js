@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect, assert } from 'chai'
 
 import Feed from './feed.class'
 import Article from './article.class'
@@ -16,6 +16,14 @@ const dummyMeta = {
     author: 'Sam Altman',
     copyright: 'Sam Altman 2016'
 }
+
+const testSort = [
+    { pubdate: '2016/09/01', sortedIndex: 3 },
+    { pubdate: '2016/10/01', sortedIndex: 4 },
+    { pubdate: '2015/09/01', sortedIndex: 0 },
+    { pubdate: '2016/05/01', sortedIndex: 2 },
+    { pubdate: '2016/12/01', sortedIndex: 5 }
+]
 
 let feed
 
@@ -47,11 +55,11 @@ describe('feed class', () => {
 
     it('should have a getFeed() method that retrieves a feed and emits an event for each entry and when complete', (done) => {
         expect(feed.getFeed).to.be.a('function')
-        feed.on('loading', (data) => expect(data).to.equal('Loading ' + feed._url + '...'))
-        feed.on('newEntry', (entry) => expect(entry).to.be.instanceOf(Article))
-        feed.on('loaded', (data) => { expect(data).to.be.a('string').to.contain('Finished downloading ' + feed._url); done(); })
+        feed.on('loading', (data) => expect(data).to.equal('Loading ' + feed.url + '...'))
+        feed.on('entry', (entry) => expect(entry).to.be.instanceOf(Article))
+        feed.on('loaded', (data) => { expect(data).to.be.a('string').to.contain('Finished downloading'); done(); })
         feed.on('error', (error) => assert.fail(error))
-        feed.getFeed(feed._url)
+        feed.getFeed(feed.url)
     })
     
     it('should have a toDate() method that returns a JS date from a string', () => {
@@ -97,8 +105,11 @@ describe('feed class', () => {
         expect(feed.entries[length]).to.be.a('object').to.have.property('article').to.equal('New article')      
     })
 
-    it('should have a poll method that checks the feed for updates', () => {
+    it('should have a poll method that checks the feed for updates', (done) => {
         expect(feed.poll).to.be.a('function')
+        feed.on('error', (error) => assert.fail(error))
+        feed.on('pollComplete', () => { assert.isOk('completion notification received'); done(); })
+        feed.poll(feed)
     })
 
     it('should have a titles method that returns a list of all the article titles', () => {
@@ -126,7 +137,21 @@ describe('feed class', () => {
     
     it('should have a sortByDate method that returns a promise', () => {
         expect(feed.sortByDate).to.be.a('function')
+        feed.entries = testSort
         expect(feed.sortByDate()).to.be.a('promise')
+        // feed.sortByDate()
+        //     .then(sortedEntries => {
+        //         sortedEntries.forEach((entry, index) =>{
+        //             expect(entry.sortedIndex).to.equal(index)
+        //             done();
+        //         })
+        //     })
+        //     .catch(e => assert.fail(e))
+    })
+
+    it('should have a size() method that returns the number of articles in the feed', () => {
+        expect(feed.size).to.be.a('function')
+        expect(feed.size()).to.equal(feed.entries.length)
     })
   
 })
