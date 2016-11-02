@@ -26,6 +26,8 @@ var dummyMeta = {
     copyright: 'Sam Altman 2016'
 };
 
+var testSort = [{ pubdate: '2016/09/01', sortedIndex: 3 }, { pubdate: '2016/10/01', sortedIndex: 4 }, { pubdate: '2015/09/01', sortedIndex: 0 }, { pubdate: '2016/05/01', sortedIndex: 2 }, { pubdate: '2016/12/01', sortedIndex: 5 }];
+
 var feed = void 0;
 
 describe('feed class', function () {
@@ -57,18 +59,18 @@ describe('feed class', function () {
     it('should have a getFeed() method that retrieves a feed and emits an event for each entry and when complete', function (done) {
         (0, _chai.expect)(feed.getFeed).to.be.a('function');
         feed.on('loading', function (data) {
-            return (0, _chai.expect)(data).to.equal('Loading ' + feed._url + '...');
+            return (0, _chai.expect)(data).to.equal('Loading ' + feed.url + '...');
         });
-        feed.on('newEntry', function (entry) {
+        feed.on('entry', function (entry) {
             return (0, _chai.expect)(entry).to.be.instanceOf(_article2.default);
         });
         feed.on('loaded', function (data) {
-            (0, _chai.expect)(data).to.be.a('string').to.contain('Finished downloading ' + feed._url);done();
+            (0, _chai.expect)(data).to.be.a('string').to.contain('Finished downloading');done();
         });
         feed.on('error', function (error) {
-            return assert.fail(error);
+            return _chai.assert.fail(error);
         });
-        feed.getFeed(feed._url);
+        feed.getFeed(feed.url);
     });
 
     it('should have a toDate() method that returns a JS date from a string', function () {
@@ -110,8 +112,15 @@ describe('feed class', function () {
         (0, _chai.expect)(feed.entries[length]).to.be.a('object').to.have.property('article').to.equal('New article');
     });
 
-    it('should have a poll method that checks the feed for updates', function () {
+    it('should have a poll method that checks the feed for updates', function (done) {
         (0, _chai.expect)(feed.poll).to.be.a('function');
+        feed.on('error', function (error) {
+            return _chai.assert.fail(error);
+        });
+        feed.on('pollComplete', function () {
+            _chai.assert.isOk('completion notification received');done();
+        });
+        feed.poll(feed);
     });
 
     it('should have a titles method that returns a list of all the article titles', function () {
@@ -127,7 +136,7 @@ describe('feed class', function () {
             feed.top(5, 0).subscribe(function (i) {
                 return titles.push(i.title);
             }, function (e) {
-                return assert.fail(e);
+                return _chai.assert.fail(e);
             }, function (c) {
                 (0, _chai.expect)(titles).to.be.a('array').to.have.length(5);
                 done();
@@ -138,6 +147,20 @@ describe('feed class', function () {
 
     it('should have a sortByDate method that returns a promise', function () {
         (0, _chai.expect)(feed.sortByDate).to.be.a('function');
+        feed.entries = testSort;
         (0, _chai.expect)(feed.sortByDate()).to.be.a('promise');
+        // feed.sortByDate()
+        //     .then(sortedEntries => {
+        //         sortedEntries.forEach((entry, index) =>{
+        //             expect(entry.sortedIndex).to.equal(index)
+        //             done();
+        //         })
+        //     })
+        //     .catch(e => assert.fail(e))
+    });
+
+    it('should have a size() method that returns the number of articles in the feed', function () {
+        (0, _chai.expect)(feed.size).to.be.a('function');
+        (0, _chai.expect)(feed.size()).to.equal(feed.entries.length);
     });
 });

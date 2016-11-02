@@ -37,33 +37,31 @@ var Feed = function (_EventEmitter) {
         var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Feed).call(this, props));
 
         if (!props.url) throw new Error('Can\'t create a new feed - we need a url to fetch it from.');
-        _this._url = props.url;
+        _this.url = props.url;
         _this.refreshInterval = props.refreshInterval || 5;
         _this.entries = [];
-        _this._sortedEntries = [];
+        _this.sortedEntries = [];
         return _this;
     }
 
     _createClass(Feed, [{
         key: 'init',
         value: function init() {
-            var self = this;
-            self.getFeed(self._url);
-            self.on('loaded', function () {
-                (0, _util.every)(self.refreshInterval, self.poll, self);
-                self.sortByDate(self).then(function (sorted) {
-                    return self.emit('ready', 'Finished reading and sorting ' + self._url + '. There are ' + self.titles().length + ' articles in the feed.' + '\n The last update was on ' + self.date);
+            var feed = this;
+            feed.getFeed(feed.url);
+            feed.on('loaded', function () {
+                (0, _util.every)(feed.refreshInterval, feed.poll, feed);
+                feed.sortByDate(feed).then(function (sorted) {
+                    return feed.emit('ready', 'Finished reading and sorting ' + feed.url + '. There are ' + feed.titles().length + ' articles in the feed.' + '\n The last update was on ' + feed.date);
                 }).catch(function (error) {
-                    return self.emit('error', error);
+                    return feed.emit('error', error);
                 });
             });
-            self.on('reloaded', function () {
-                console.log('just reloaded the feed!');
-                // self._sortedEntries = [{title: 'Test updates!'}]
-                self.sortByDate(self).then(function (sorted) {
-                    return self.emit('updateComplete', 'Finished reading and sorting ' + self._url + '. There are ' + self.titles().length + ' articles in the feed.' + '\n The last update was on ' + self.date);
+            feed.on('reloaded', function () {
+                feed.sortByDate(feed).then(function (sorted) {
+                    return feed.emit('updateComplete', 'Finished reading and sorting ' + feed.url + '. There are ' + feed.titles().length + ' articles in the feed.' + '\n The last update was on ' + feed.date);
                 }).catch(function (error) {
-                    return self.emit('error', error);
+                    return feed.emit('error', error);
                 });
             });
         }
@@ -122,7 +120,7 @@ var Feed = function (_EventEmitter) {
             var x = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
             var t = arguments.length <= 1 || arguments[1] === undefined ? 2 : arguments[1];
 
-            return _rxjs2.default.Observable.from(this._sortedEntries).take(x).zip(_rxjs2.default.Observable.interval(t * 1000), function (a, b) {
+            return _rxjs2.default.Observable.from(this.sortedEntries).take(x).zip(_rxjs2.default.Observable.interval(t * 1000), function (a, b) {
                 return a;
             });
         }
@@ -148,7 +146,7 @@ var Feed = function (_EventEmitter) {
                 }, function (error) {
                     _this3.emit('error', error);
                 }, function (complete) {
-                    if (!refresh) _this3.emit('loaded', 'Finished downloading ' + _this3._url + '. There are ' + _this3.titles().length + ' articles in the feed.' + '\n The last update was on ' + _this3.date);else _this3.emit('reloaded', 'Finished updating ' + _this3._url + '. There are ' + _this3.titles().length + ' articles in the feed.' + '\n The last update was on ' + _this3.date);
+                    if (!refresh) _this3.emit('loaded', 'Finished downloading');else _this3.emit('reloaded');
                 });
             }).catch(function (e) {
                 return _this3.emit('error', e);
@@ -156,33 +154,38 @@ var Feed = function (_EventEmitter) {
         }
     }, {
         key: 'poll',
-        value: function poll(self) {
-            self.emit('polling');
-            _util.xhr.getStream(self._url).then(function (res) {
+        value: function poll(feed) {
+            feed.emit('polling');
+            _util.xhr.getStream(feed.url).then(function (res) {
                 return (0, _util.observableXmlStream)(res).take(1).subscribe(function (entry) {
-                    if (self.toDate(entry.meta.date) > self.date) self.getFeed(self._url, true);
+                    if (feed.toDate(entry.meta.date) > feed.date) feed.getFeed(feed.url, true);
                 }, function (error) {
-                    return self.emit('error', error);
+                    return feed.emit('error', error);
                 }, function (complete) {
-                    return self.emit('pollComplete');
+                    return feed.emit('pollComplete');
                 });
             }).catch(function (e) {
-                return self.emit('error', e);
+                return feed.emit('error', e);
             });
         }
     }, {
         key: 'sortByDate',
-        value: function sortByDate(self) {
+        value: function sortByDate(feed) {
             return new Promise(function (resolve, reject) {
-                self._sortedEntries = self.entries.map(function (entry) {
-                    entry._date = self.toDate(entry.date);
+                feed.sortedEntries = feed.entries.map(function (entry) {
+                    entry._date = feed.toDate(entry.pubdate);
                     if (!entry._date) reject(new Error('Articles contain invalid dates'));
                     return entry;
                 }).sort(function (a, b) {
                     return b._date - a._date;
                 });
-                resolve(self._sortedEntries);
+                resolve(feed.sortedEntries);
             });
+        }
+    }, {
+        key: 'size',
+        value: function size() {
+            return this.entries.length;
         }
     }]);
 
