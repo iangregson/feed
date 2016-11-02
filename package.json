@@ -1,6 +1,6 @@
 {
   "name": "scruffy",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A node.js service for turning an RSS feed into a JSON ticker",
   "main": "index.js",
   "scripts": {
