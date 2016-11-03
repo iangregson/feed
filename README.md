@@ -1,7 +1,9 @@
 # Scruffy
-A node.js service for turning an RSS feed into a JSON ticker
-
 [![Build Status](https://travis-ci.org/iangregson/scruffy.svg?branch=master)](https://travis-ci.org/iangregson/scruffy)
+
+Turns an RSS feed into a JS object ticker using Observables.
+Use it to get the most recent articles from a feed at a given interval.
+
 
 ## Install from npm:
 
@@ -23,8 +25,8 @@ feed.init()
 
 ```javascript
 const options = {
-  url:  'http://example.com/posts.atom' // the url to get the feed from (atom / rss xml)
-  refreshInterval: 30                   // how often the feed will be refreshed in seconds (defaults to 5)
+  url:  'http://example.com/posts.atom' // the url to get the feed from (atom / rss xml).
+  refreshInterval: 30                   // how often the feed will be refreshed in seconds (defaults to 5).
 }
 
 const feed = new Feed(options)
@@ -35,11 +37,24 @@ const feed = new Feed(options)
 ### Api
 
 ```javascript
-.top(n, t)    // returns Observable of n number of most recent articles in the feed, emitting one every t seconds. Defaults to 10 articles every 2 seconds  
+.top(n, t)    // returns Observable of n number of most recent articles in the feed, emitting one 
+              // every t seconds. Defaults to 10 articles every 2 seconds.
 
-.size()       // returns the number of articles in the feed
+.size()       // returns the number of articles in the feed.
 
-.titles()     // returns an array of all the titles in the feed
+.titles()     // returns an array of all the titles in the feed.
+```
+
+### Events
+
+```javascript
+.on('loading', msg => console.log(msg))   // when the feed starts loading, a message is emitted.
+
+.on('error', err => console.log(err))     // when there's an error, an event is emitted with the 
+                                          // error object.
+
+.on('ready', msg => console.log(msg))     // when the feed is ready to use, a message is emitted.
+                                          // once ready, use the api on your feed object.
 ```
 
 ### Commands
