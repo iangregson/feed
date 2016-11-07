@@ -1,5 +1,6 @@
 # Scruffy
 [![Build Status](https://travis-ci.org/iangregson/scruffy.svg?branch=master)](https://travis-ci.org/iangregson/scruffy)
+[![Coverage Status](https://coveralls.io/repos/github/iangregson/scruffy/badge.svg?branch=master)](https://coveralls.io/github/iangregson/scruffy?branch=master)
 
 Turns an RSS feed into a JS object ticker using Observables.
 Use it to get the most recent articles from a feed at a given interval.
